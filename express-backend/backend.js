@@ -22,6 +22,11 @@ const users = {
           job: 'Professor',
        }, 
        {
+          id: 'ggg123',
+          name: 'Dennis',
+          job: 'Engineer'
+       },
+       {
           id: 'yat999', 
           name: 'Dee',
           job: 'Aspring actress',
@@ -34,10 +39,22 @@ const users = {
     ]
 }
 
+function findUserByName(name) {
+    return users['users_list'].find( (user) => user['name'] == name);
+}
+
 app.use(express.json());
 
 app.get('/users', (req, res) => {
-    res.send(users);
+    const name = req.query.name;
+    if (name != undefined) {
+        let result = findUserByName(name);
+        result = {users_list: result};
+        res.send(result);
+    }
+    else {
+        res.send(users);
+    }
 });
 
 app.get('/', (req, res) => {
