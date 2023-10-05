@@ -43,6 +43,10 @@ function findUserByName(name) {
     return users['users_list'].filter( (user) => user['name'] == name);
 }
 
+function addUser(user){
+    users['users_list'].push(user);
+}
+
 app.use(express.json());
 
 app.get('/users', (req, res) => {
@@ -58,7 +62,7 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/users/:id', (req, res) => {
-    const id = req.params['id']; //or req.params.id
+    const id = req.params['id'];
     let result = findUserById(id);
     if (result === undefined || result.length == 0)
         res.status(404).send('Resource not found.');
@@ -74,6 +78,18 @@ function findUserById(id) {
 
 app.get('/', (req, res) => {
     res.send("Go fuck yourself");
+});
+
+app.post('/users', (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.status(200).end();
+});
+
+app.delete('/users/:id', (req, res) => {
+    const id = req.params['id'];
+    users.users_list.delete(id);
+    res.status(200).end();
 });
 
 app.listen(port, () => {
