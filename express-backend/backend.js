@@ -1,11 +1,13 @@
 import express from "express";
+import { UnorderedBulkOperation } from "mongodb";
 
 const app = express();
+app.use(express.json());
 const port = 8000;
 
+//Variables
 const users = { 
-    users_list :
-    [
+    users_list: [
        { 
           id : 'xyz789',
           name : 'Charlie',
@@ -39,19 +41,35 @@ const users = {
     ]
 }
 
+// Helper Functions
+function findUserByNameAndJob(name, job) {
+    return users.users_list.filter((user) => user.name == name && user.job == job);
+}
+
 function findUserByName(name) {
     return users['users_list'].filter( (user) => user['name'] == name);
+}
+
+function findUserById(id) {
+    return users.users_list.find( (ele) => ele.id == id);
 }
 
 function addUser(user){
     users['users_list'].push(user);
 }
 
-app.use(express.json());
+// HTTP Operations
 
+// Get
 app.get('/users', (req, res) => {
     const name = req.query.name;
-    if (name != undefined) {
+    const job = req.query.job;
+    if (name != undefined && job != undefined) {
+       let result = findUserByNameAndJob(name, job);
+       result = {users_list: result};
+       res.send(result);
+    }
+    else if (name != undefined) {
         let result = findUserByName(name);
         result = {users_list: result};
         res.send(result);
@@ -72,26 +90,26 @@ app.get('/users/:id', (req, res) => {
     }
 });
 
-function findUserById(id) {
-    return users['users_list'].filter( (user) => user['id'] === id);
-}
-
 app.get('/', (req, res) => {
     res.send("Go fuck yourself");
 });
 
+// Post
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
     res.status(200).end();
 });
 
+// Delete
 app.delete('/users/:id', (req, res) => {
     const id = req.params['id'];
-    users.users_list.delete(id);
+    let idxToRemove = users.users_list.findIndex((ele) => ele.id == id);
+    delete users.users_list[idxToRemove];
     res.status(200).end();
 });
 
+// Start App
 app.listen(port, () => {
     console.log('Example app listening at http://localhost:${port}');
 });
