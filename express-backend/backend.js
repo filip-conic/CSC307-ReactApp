@@ -1,8 +1,10 @@
 import express from "express";
-import { UnorderedBulkOperation } from "mongodb";
+import cors from 'cors';
+import ShortUniqueId from "short-unique-id";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 const port = 8000;
 
 //Variables
@@ -91,22 +93,24 @@ app.get('/users/:id', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send("Hello World");
+    res.send("Basic Get");
 });
 
 // Post
 app.post('/users', (req, res) => {
-    const userToAdd = req.body;
+    let userToAdd = req.body;
+    const uid = new ShortUniqueId({ length: 6 });
+    userToAdd.id = uid.rnd();
     addUser(userToAdd);
-    res.status(200).end();
+    res.status(201).end(JSON.stringify(userToAdd));
 });
 
 // Delete
-app.delete('/users/:id', (req, res) => {
+app.delete('/users', (req, res) => {
     const id = req.params['id'];
     let idxToRemove = users.users_list.findIndex((ele) => ele.id == id);
-    delete users.users_list[idxToRemove];
-    res.status(200).end();
+    delete users.users_list.splice(idxToRemove, 1);
+    res.status(204).end();
 });
 
 // Start App
