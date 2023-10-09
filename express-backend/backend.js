@@ -91,7 +91,7 @@ app.get('/users/:id', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send("Go fuck yourself");
+    res.send("Hello World");
 });
 
 // Post
